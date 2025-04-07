@@ -14,16 +14,16 @@ private:
     double price;
 
 public:
-    Item(string n, string c, int q, double p, int i) {
-        this->id = i;
-        this->quantity = q;
+    Item(string n, string c, int qty, double p, int id) {
+        this->id = id;
+        this->quantity = qty;
         this->name = n;
         this->category = c;
         this->price = p;
     }
 
-    void setQuantity(int q) {
-        this->quantity = q;
+    void setQuantity(int qty) {
+        this->quantity = qty;
     }
 
     void setPrice(double p) {
@@ -51,7 +51,7 @@ public:
     }
 
     void display() const {
-        cout << id << "\t\t " << name << "\t\t " << quantity << "\t\t " << price << "\t\t " << category << endl;
+        cout << id << "\t\t" << name << "\t\t" << quantity << "\t\t " << price << "\t\t " << category << endl;
     }
 };
 
@@ -59,7 +59,7 @@ vector<Item> items;
 int autoID = 1;
 
 void header() {
-    cout << "ID\t\tName\t\tQuantity\t\tPrice\t\tCategory" << endl;
+    cout << "ID\t\tName\t\tQuantity\tPrice\t\tCategory" << endl;
 }
 
 void addItem() {
@@ -105,7 +105,8 @@ void addItem() {
 
         cout << "Enter Quantity: ";
         cin >> quantity;
-        if (cin.fail() || quantity < 0) {
+        if (cin.fail() || quantity < 0) 
+        {
             cout << "Invalid quantity. Please enter a valid positive number.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -119,14 +120,13 @@ void addItem() {
             cout << "Invalid price. Please enter a valid positive number.\n";
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            validInput = false;
         }
 
     } while (!validInput);
 
     items.push_back(Item(name, category, quantity, price, autoID));
     autoID++;
-    cout << "Item added successfully!" << endl;
+    cout << endl << "Item added successfully!" << endl;
 }
 
 void updateItem() {
@@ -150,7 +150,7 @@ void updateItem() {
     for (int i = 0; i < items.size(); i++) {
         if (items[i].getId() == id) {
             int updateItemChoice;
-            cout << "Price[1] or Quantity[2]: ";
+            cout << "1. Price or 2. Quantity: ";
             cin >> updateItemChoice;
 
             while (true) {
@@ -240,6 +240,11 @@ void removeItem() {
 }
 
 void displayAllItems() {
+    if (items.empty()) {
+        cout << "No items to display.\n";
+        return;
+    }
+
     header();
     for (int i = 0; i < items.size(); i++) {
         items[i].display();
@@ -308,46 +313,54 @@ void displayByCategory() {
 }
 
 void displaySearchItem() {
-    int choice;
+    int id;
     bool validInput;
+    bool ifFound = false;
 
     do {
         validInput = true;
-        cout << "Search Item: " << endl;
-        cout << "ID[1] or Category[2]: ";
-        cin >> choice;
+        cout << "\nEnter ID to search item: ";
+        cin >> id;
 
-        if (choice != 1 && choice != 2) {
-            cout << "Invalid input. Please enter 1 for ID or 2 for Category.\n";
+        if (cin.fail()) {
+            cout << "Invalid ID input. Please enter a valid number.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             validInput = false;
         }
     } while (!validInput);
 
-    if (choice == 1) {
-        displayByID();
+    header();
+    for (int i = 0; i < items.size(); i++) {
+        if (items[i].getId() == id) {
+            items[i].display();
+            ifFound = true;
+            break;
+        }
     }
-    else {
-        displayByCategory();
+
+    if (!ifFound) {
+        cout << "\nItem not found!" << endl;
     }
 }
 
 void displayLowStock() {
     if (items.empty()) {
-        cout << "\nInventory is empty. No items to display.\n";
+        cout << "\nNothing in inventory. No items to display.\n";
         return;
     }
 
     bool ifFound = false;
     header();
     for (int i = 0; i < items.size(); i++) {
-        if (items[i].getQuantity() <= 10) {
+        if (items[i].getQuantity() <= 5) {
             items[i].display();
             ifFound = true;
         }
     }
 
     if (!ifFound) {
-        cout << "\nNo low stock items found!" << endl;
+        cout << "\nThere are no low stock items found!" << endl;
     }
 }
 
@@ -357,7 +370,7 @@ void sortItems() {
 
     do {
         validInput = true;
-        cout << "\nSort by Quantity[1] or Price[2]: ";
+        cout << "\nSort by 1. Quantity or 2. Price: ";
         cin >> sortBy;
         if (cin.fail() || (sortBy != 1 && sortBy != 2)) {
             cout << "Invalid input. Please enter 1 for Quantity or 2 for Price.\n";
@@ -369,7 +382,7 @@ void sortItems() {
 
     do {
         validInput = true;
-        cout << "Ascending[1] or Descending[2]: ";
+        cout << "1. Ascending or 2. Descending: ";
         cin >> order;
         if (cin.fail() || (order != 1 && order != 2)) {
             cout << "Invalid input. Please enter 1 for Ascending or 2 for Descending.\n";
